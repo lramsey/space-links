@@ -1,12 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="spaceLinks">
   <head>
     <script src="jquery.js"></script>
     <script src="angular.min.js"></script>
     <script src="app.js"></script>
   </head>
-  <body>
+  <body ng-controller="presentPosts">
     <h1>Open Source Data</h1>
+    <input ng-model="key" ng-keyup="onSearch()"></input>
     <button>space</button>
     <div class='container'></div>
   </body>
