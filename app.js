@@ -1,10 +1,10 @@
 var query = 'http://data.nasa.gov/api/get_recent_datasets?count=100';
-
+var slugs;
 var app = angular.module("spaceLinks", []);
 app.controller('presentPosts', function($scope){
 
   $scope.ids = [];
-  $scope.slugs = {'':$scope.ids};
+  slugs = {'':$scope.ids};
   $scope.dataPosts = {};
 
   $scope.getData = function(query){
@@ -62,10 +62,10 @@ app.controller('presentPosts', function($scope){
 
   var slugBuilder = function(results){
     for(var i = 0; i < results.tags.length; i++){
-      if($scope.slugs[results.tags[i]] === undefined){
-        $scope.slugs[results.tags[i]] = [];
+      if(slugs[results.tags[i]] === undefined){
+        slugs[results.tags[i]] = [];
       }
-      $scope.slugs[results.tags[i]].push(results.id);
+      slugs[results.tags[i]].push(results.id);
     }
   }
   var displayPost = function(results){
@@ -88,19 +88,18 @@ app.controller('presentPosts', function($scope){
   };
 
   angular.element('button').on('click', function(){
-    $scope.getData(query);
+    
   });
   
   $scope.onSearch = function(){
-    var tag = $scope.slugs[$scope.key];
-    console.log($scope.key);
-    console.log(tag);
+    var tag = slugs[$scope.key];
     angular.element('.container').empty();
     if(!!tag){
       for(var i = 0; i < tag.length; i++){
-        displayPost($scope.dataPosts[i]);
+        displayPost($scope.dataPosts[slugs[$scope.key][i]]);
       }
     }
   };
 
+  $scope.getData(query);
 });
