@@ -104,9 +104,8 @@ app.controller('presentPosts', function($scope){
   var displayPost = function(results){
     var $post = angular.element('<div class="post"></div>').append('</br>');
     var $el;
-    if(results.source === undefined){
-      results.source = results.url;
-    }
+    results.source = results.source || results.url;
+    results.clicks = results.clicks || 0;
     for(var item in results){
       if(item === 'content'){
         $el = results[item];
@@ -128,18 +127,28 @@ app.controller('presentPosts', function($scope){
   $scope.buttonClick = function(input){
     if(input === 'tags'){
       displaySlugs();
-    } else if (input === 'random' || input === 'shuffle' || input === 'click rank'){
+    } else if (input === 'random' || input === 'shuffle' || input === 'rank'){
       $scope.key = $scope.key || 'all';
-      console.log($scope.key);
       var selectedPostIds = slugs[$scope.key];
       angular.element('.container').empty();
       if(input === 'random'){
         var index = Math.floor(Math.random()*selectedPostIds.length);
         displayPost($scope.dataPosts[selectedPostIds[index]]);
-      } else if( input === 'shuffle'){
+      } else if(input === 'shuffle'){
         shuffleDeck(selectedPostIds);
         for(var i = 0; i < selectedPostIds.length; i++){
           displayPost($scope.dataPosts[selectedPostIds[i]]);
+        }
+      } else if (input ==='rank'){
+        var selectedPosts = [];
+        for(var j = 0; j < selectedPostIds.length; j++){
+          selectedPosts.push($scope.dataPosts[selectedPostIds[j]]);
+        }
+        selectedPosts.sort(function(a, b){
+          return b.clicks-a.clicks;
+        });
+        for(var k = 0; k < selectedPosts.length; k++){
+          displayPost(selectedPosts[k]);
         }
       }
     } else {
