@@ -1,25 +1,35 @@
-var http = require("http");
-var fs = require("fs");
-var messageHandler = require('./request-handler.js');
-var url = require('url');
+var express = require('express');
+var handle = require('./request-handler.js');
+
 var port = 3000;
-var ip = "127.0.0.1";
+//ip address 127.0.0.1
+var app = express();
 
-var routes = {
-  "/clicks": messageHandler.handleRequest
+var defaultCorsHeaders = {
+  "access-control-allow-origin": "*",
+  "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
+  "access-control-allow-headers": "content-type, accept",
+  "access-control-max-age": 10 // Seconds.
 };
 
-var router = function(request, response) {
-  var path = url.parse(request.url).pathname;
-  var route = routes[path];
-  if(route) {
-    route(request, response);
-  } else {
-    console.log('nonononono');
-  }
-};
+app.configure(function(){
+  app.use('/', express.static(__dirname + '/../client'));
+  app.use(function(req, res, next) {
+    _(defaultCorsHeaders).each(function(item, k){
+        res.setHeader(k, item);
+    });
+    return next();
+  });
+});
 
-var handleRequest =  require('./request-handler.js');
-var server = http.createServer(handleRequest.handleRequest);
-console.log("Listening on http://" + ip + ":" + port);
-server.listen(port, ip);
+var server = app.listen(port, function() {
+    console.log('Listening on port' + server.address().port);
+});
+
+app.get('/clicks', function(req, res){
+  handle.handleRequest(req, res);
+});
+
+app.post('/clicks', function(req, res){
+  handle.handleRequest(req, res);
+});

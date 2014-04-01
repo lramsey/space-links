@@ -8,12 +8,34 @@ app.controller('presentPosts', function($scope){
     $scope.query = 'http://data.nasa.gov/api/get_recent_datasets?count=100';
     $scope.dataPosts = {};
     $scope.key = 'all';
-    $scope.getData($scope.query);
+    $scope.getNasaData($scope.query);
   };
 
-  $scope.getData = function(query){
+  $scope.getNasaData = function(query){
     $.ajax({
       url: query,
+      type: 'GET',
+      dataType: 'jsonp',
+      success: function(data){
+        filterPosts(data.posts);
+      }
+    });
+  };
+
+  var postServerData = function(){
+    $.ajax({
+      url: '127.0.0.1:3000/clicks',
+      type: 'POST',
+      dataType: 'jsonp',
+      success: function(data){
+        getServerData(data);
+      }
+    });
+  };
+
+  var getServerData = function(){
+    $.ajax({
+      url: '127.0.0.1:3000/clicks',
       type: 'GET',
       dataType: 'jsonp',
       success: function(data){
@@ -22,16 +44,14 @@ app.controller('presentPosts', function($scope){
     });
   };
 
-  var filterData = function(posts){
+ /* var filterData = function(posts){
     for(var i = 0; i < posts.length; i++){
       filterPost(posts[i]);
     }
     $scope.listenForTitleClick();
-  };
+  }; */
 
-  var filterPost = function(post){
-    var resultsObj = {};
-    resultsObj.tags = [];
+  var filterPosts = function(posts){
     var recursiveFilter = function(info){
       for(var point in info){
         if(info[point] !== ''){
@@ -46,6 +66,8 @@ app.controller('presentPosts', function($scope){
               resultsObj.srcId = info[point];
             } else if(point === 'url'){
               resultsObj.url = info[point];
+            } else if (point === 'clicks'){
+              resultsObj.clicks = info[point];
             }
           } else if(point === 'more_info_link') {
             resultsObj.source = info[point][0];
@@ -55,17 +77,23 @@ app.controller('presentPosts', function($scope){
         }
       }
     };
-    if($scope.ids.length === 0){
-      resultsObj.id = 1;
-    } else {
-      resultsObj.id = $scope.ids[$scope.ids.length-1] + 1;
+
+    for(var i = 0; i < posts.length; i++){
+      var resultsObj = {};
+      resultsObj.tags = [];
+      if($scope.ids.length === 0){
+        resultsObj.id = 1;
+      } else {
+        resultsObj.id = $scope.ids[$scope.ids.length-1] + 1;
+      }
+      $scope.ids.push(resultsObj.id);
+      $scope.dataPosts[resultsObj.id] = resultsObj;
+      recursiveFilter(posts[i]);
+      slugBuilder(resultsObj);
     }
-    $scope.ids.push(resultsObj.id);
-    $scope.dataPosts[resultsObj.id] = resultsObj;
-    recursiveFilter(post);
-    slugBuilder(resultsObj);
-    displayPost(resultsObj);
+    displayPosts($scope.dataPosts);
   };
+
 
   var slugBuilder = function(results){
     for(var i = 0; i < results.tags.length; i++){
@@ -102,6 +130,13 @@ app.controller('presentPosts', function($scope){
         displayPost(item);
       }
     });
+  };
+
+  var displayPosts = function(posts){
+    for(var item in posts){
+      displayPost(posts[item]);
+    }
+    $scope.listenForTitleClick();
   };
 
   var displayPost = function(results){
