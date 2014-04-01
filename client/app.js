@@ -1,13 +1,15 @@
-var query = 'http://data.nasa.gov/api/get_recent_datasets?count=100';
-var slugs;
 var app = angular.module("spaceLinks", []);
 
 app.controller('presentPosts', function($scope){
 
-  $scope.ids = [];
-  slugs = { 'all': $scope.ids };
-  $scope.dataPosts = {};
-  $scope.key = 'all';
+  $scope.initialize = function(){
+    $scope.ids = [];
+    $scope.slugs = { 'all': $scope.ids };
+    $scope.query = 'http://data.nasa.gov/api/get_recent_datasets?count=100';
+    $scope.dataPosts = {};
+    $scope.key = 'all';
+    $scope.getData($scope.query);
+  };
 
   $scope.getData = function(query){
     $.ajax({
@@ -67,16 +69,16 @@ app.controller('presentPosts', function($scope){
 
   var slugBuilder = function(results){
     for(var i = 0; i < results.tags.length; i++){
-      if(slugs[results.tags[i]] === undefined){
-        slugs[results.tags[i]] = [];
+      if($scope.slugs[results.tags[i]] === undefined){
+        $scope.slugs[results.tags[i]] = [];
       }
-      slugs[results.tags[i]].push(results.id);
+      $scope.slugs[results.tags[i]].push(results.id);
     }
   };
 
   var displaySlugs = function(){
     angular.element('.container').empty();
-    var keyList = Object.keys(slugs).sort();
+    var keyList = Object.keys($scope.slugs).sort();
     angular.element('.container').append('<div class="col1"></div>');
     angular.element('.container').append('<div class ="col2"></div>');
     angular.element('.container').append('<div class= "col3"></div>');
@@ -92,7 +94,7 @@ app.controller('presentPosts', function($scope){
     }
     angular.element('.container').on('click', 'ul', function(){
       var tag = angular.element(this).text();
-      var posts = slugs[tag];
+      var posts = $scope.slugs[tag];
       angular.element('.container').empty();
       for(var i = 0; i < posts.length; i++){
         console.log(posts[i]);
@@ -130,7 +132,7 @@ app.controller('presentPosts', function($scope){
       displaySlugs();
     } else if (input === 'random' || input === 'shuffle' || input === 'rank'){
       $scope.key = $scope.key || 'all';
-      var selectedPostIds = slugs[$scope.key];
+      var selectedPostIds = $scope.slugs[$scope.key];
       angular.element('.container').empty();
       if(input === 'random'){
         var index = Math.floor(Math.random()*selectedPostIds.length);
@@ -178,11 +180,11 @@ app.controller('presentPosts', function($scope){
   
   $scope.onSearch = function(){
     $scope.key = $scope.key || 'all';
-    var tag = slugs[$scope.key];
+    var tag = $scope.slugs[$scope.key];
     angular.element('.container').empty();
     if(!!tag){
       for(var i = 0; i < tag.length; i++){
-        displayPost($scope.dataPosts[slugs[$scope.key][i]]);
+        displayPost($scope.dataPosts[$scope.slugs[$scope.key][i]]);
       }
     }
   };
@@ -195,8 +197,7 @@ app.controller('presentPosts', function($scope){
       deck[cardIndex] = lastCard;
     }
   };
+
+  $scope.initialize();
   
-
-  $scope.getData(query);
-
 });
