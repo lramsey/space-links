@@ -1,5 +1,22 @@
-body {
-  background-color: rgb(192,192,192);
+html, body {
+  height: 100%;
+}
+
+body:before {
+    content: "";
+    z-index:-1;
+    background: url('spaaaace.png') no-repeat center center fixed;
+    overflow: visible;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    position: fixed;
+    left:0;
+    top:0;
+    right:0;
+    bottom:0;
+    opacity:0.3;
 }
 
 h1 {
@@ -9,10 +26,12 @@ h1 {
 
 .centered{
   text-align: center;
+  color: blue;
 }
 
 .container {
   margin-left: 3%;
+  color: black;
 }
 
 h3 {

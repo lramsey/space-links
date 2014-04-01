@@ -5,8 +5,9 @@ var app = angular.module("spaceLinks", []);
 app.controller('presentPosts', function($scope){
 
   $scope.ids = [];
-  slugs = { '':$scope.ids, 'all': $scope.ids };
+  slugs = { 'all': $scope.ids };
   $scope.dataPosts = {};
+  $scope.key = 'all';
 
   $scope.getData = function(query){
     $.ajax({
@@ -176,6 +177,7 @@ app.controller('presentPosts', function($scope){
   };
   
   $scope.onSearch = function(){
+    $scope.key = $scope.key || 'all';
     var tag = slugs[$scope.key];
     angular.element('.container').empty();
     if(!!tag){
