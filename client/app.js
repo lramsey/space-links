@@ -19,6 +19,26 @@ app.controller('presentPosts', function($scope){
     });
   };
 
+  // var postToServer = function(info){
+  //   $.ajax({
+  //     url: "127.0.0.1:3000/clicks",
+  //     type: 'POST',
+  //     success: function(data){
+  //       retrieveFromServer(data);
+  //     }
+  //   });
+  // };
+
+  // var retrieveFromServer = function(info){
+  //   $.ajax({
+  //     url: "127.0.0.1:3000/clicks",
+  //     type: 'GET',
+  //     success: function(data){
+
+  //     }
+  //   })
+  // }
+
   var filterData = function(posts){
     for(var i = 0; i < posts.length; i++){
       filterPost(posts[i]);
@@ -41,6 +61,8 @@ app.controller('presentPosts', function($scope){
               resultsObj.tags.push(info[point]);
             } else if(point === 'id'){
               resultsObj.srcId = info[point];
+            } else if(point === 'url'){
+              resultsObj.url = info[point];
             }
           } else if(point === 'more_info_link') {
             resultsObj.source = info[point][0];
@@ -70,9 +92,33 @@ app.controller('presentPosts', function($scope){
       slugs[results.tags[i]].push(results.id);
     }
   }
+
+  var displaySlugs = function(){
+    $('.container').empty();
+    var keyList = Object.keys(slugs).sort();
+    for(var i = 0; i < keyList.length; i++){
+      $span = angular.element('<ul></ul>').text(keyList[i]);
+      angular.element('.container').append($span);
+    }
+    angular.element('.container').on('click', 'ul', function(){
+      var tag = angular.element(this).text();
+      var posts = slugs[tag];
+      console.log(posts);
+      angular.element('.container').empty();
+      for(var i = 0; i < posts.length; i++){
+        console.log(posts[i]);
+        var item = $scope.dataPosts[posts[i]];
+        displayPost(item);
+      }
+    });
+  };
+
   var displayPost = function(results){
     var $post = angular.element('<div class="post"></div>').append('</br>');
     var $el;
+    if(results.source === undefined){
+      results.source = results.url;
+    }
     for(var item in results){
       if(item === 'content'){
         $el = results[item];
@@ -82,7 +128,7 @@ app.controller('presentPosts', function($scope){
       } else if (item === 'source'){
         $el = angular.element('<a href='+results[item]+'></a>');
         $el.text(results[item]);
-      } else if (item !== 'tags' && item !== 'srcId' && item !== 'id'){
+      } else if (item !== 'tags' && item !== 'srcId' && item !== 'id' && item !== 'url'){
         $el = angular.element('<p></p>').text(item+': '+results[item]);
       }
       $post.append($el);
@@ -93,8 +139,12 @@ app.controller('presentPosts', function($scope){
 
   angular.element('button').on('click', function(){
     var tag = angular.element(this).text();
+    if(tag === 'tags'){
+      displaySlugs();
+    } else {
     $scope.key = tag;
     $scope.onSearch();
+    }
   });
 
   $scope.listenForTitleClick = function(){
@@ -107,7 +157,21 @@ app.controller('presentPosts', function($scope){
   $scope.showSinglePost = function(titleId){
     var clickedPost = $scope.dataPosts[titleId];
     angular.element('.container').empty();
+    if(clickedPost.clicks === undefined){
+      clickedPost.clicks = 1;
+    } else {
+      clickedPost.clicks++;
+    }
     displayPost(clickedPost);
+    // $.ajax({
+    //   type: "POST",
+    //   url: "127.0.0.1:3000/clicks",
+    //   data: { "clicks":clickedPost.clicks,
+    //           "id": titleId },
+    //   success: function(){
+    //     console.log(clickedPost.clicks);
+    //   }
+    // });
   };
   
   $scope.onSearch = function(){
@@ -121,4 +185,5 @@ app.controller('presentPosts', function($scope){
   };
 
   $scope.getData(query);
+
 });

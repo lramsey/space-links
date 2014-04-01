@@ -1,3 +1,15 @@
 body {
   background-color: rgb(192,192,192);
 }
+
+.centered{
+  text-align: center;
+}
+
+.container {
+  margin-left: 3%;
+}
+
+h3 {
+  color: blue;
+}

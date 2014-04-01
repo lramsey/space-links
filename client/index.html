@@ -9,17 +9,21 @@
     <script src="app.js"></script>
   </head>
   <body>
-<div ng-controller="presentPosts">
-<h1>Open Source Data</h1>
-  <input ng-model="key" ng-keyup="onSearch()"></input>
-  <button>all</button>
-  <button>aeronautics</button>
-  <button>earth-science</button>
-  <button>space-science</button>
-  <button>life-science</button>
-  <button>climate</button>
-  <button>engineering</button>
-  <button>operations</button>
-  <div class='container'></div>
+  <div ng-controller="presentPosts">
+    <div class="centered">
+      <h1>Open Source Data</h1>
+      <input ng-model="key" ng-keyup="onSearch()"></input>
+      <button>all</button>
+      <button>aeronautics</button>
+      <button>earth-science</button>
+      <button>space-science</button>
+      <button>life-science</button>
+      <button>climate</button>
+      <button>engineering</button>
+      <button>operations</button>
+      <button>tags</button>
+    </div>
+    <div class='container'></div>
+  </div>
   </body>
 </html>

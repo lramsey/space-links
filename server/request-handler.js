@@ -5,24 +5,22 @@ var defaultCorsHeaders = {
   "access-control-max-age": 10, // Seconds.
 };
 
-var visits = {};
+var clicks = {};
 
 exports.handleRequest = function(request, response) {
-
-  var wrapperObject = {}; // App.js expects an object.
 
   if(request.method === "POST") {
     request.on('data', function(data) {
       var stringData = data.toString();
       var parseData = JSON.parse(stringData);
-      var id = parseData.id;
-      visits[id] = parseData.id;
+      var id = parseData.id; 
+      clicks[id] = parseData.clicks;
       results.push(parseData);
     });
   }
 
   if(request.method === "GET") {
-    wrapperObject.results = results;
+    
   }
 
   var output = JSON.stringify(wrapperObject);
