@@ -13,3 +13,18 @@ body {
 h3 {
   color: blue;
 }
+
+.col1 {
+    margin-left: 5%;
+    position: absolute;
+}
+
+.col2 {
+    margin-left: 35%;
+    position: absolute;
+}
+
+.col3 {
+    margin-left: 65%;
+    position: absolute;
+}

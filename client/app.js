@@ -19,32 +19,12 @@ app.controller('presentPosts', function($scope){
     });
   };
 
-  // var postToServer = function(info){
-  //   $.ajax({
-  //     url: "127.0.0.1:3000/clicks",
-  //     type: 'POST',
-  //     success: function(data){
-  //       retrieveFromServer(data);
-  //     }
-  //   });
-  // };
-
-  // var retrieveFromServer = function(info){
-  //   $.ajax({
-  //     url: "127.0.0.1:3000/clicks",
-  //     type: 'GET',
-  //     success: function(data){
-
-  //     }
-  //   })
-  // }
-
   var filterData = function(posts){
     for(var i = 0; i < posts.length; i++){
       filterPost(posts[i]);
     }
     $scope.listenForTitleClick();
-  }
+  };
 
   var filterPost = function(post){
     var resultsObj = {};
@@ -91,19 +71,27 @@ app.controller('presentPosts', function($scope){
       }
       slugs[results.tags[i]].push(results.id);
     }
-  }
+  };
 
   var displaySlugs = function(){
-    $('.container').empty();
+    angular.element('.container').empty();
     var keyList = Object.keys(slugs).sort();
+    angular.element('.container').append('<div class="col1"></div>');
+    angular.element('.container').append('<div class ="col2"></div>');
+    angular.element('.container').append('<div class= "col3"></div>');
     for(var i = 0; i < keyList.length; i++){
       $span = angular.element('<ul></ul>').text(keyList[i]);
-      angular.element('.container').append($span);
+      if(i%3 === 0){
+        angular.element('.col3').append($span);
+      } else if (i%2 === 0){
+        angular.element('.col2').append($span);
+      } else {
+        angular.element('.col1').append($span);
+      }
     }
     angular.element('.container').on('click', 'ul', function(){
       var tag = angular.element(this).text();
       var posts = slugs[tag];
-      console.log(posts);
       angular.element('.container').empty();
       for(var i = 0; i < posts.length; i++){
         console.log(posts[i]);
@@ -141,6 +129,15 @@ app.controller('presentPosts', function($scope){
     var tag = angular.element(this).text();
     if(tag === 'tags'){
       displaySlugs();
+    } else if (tag === 'random'){
+      $scope.key = $scope.key || 'all';
+      console.log($scope.key);
+      var selectedPostIds = slugs[$scope.key];
+      var index = Math.floor(Math.random()*selectedPostIds.length);
+      console.log("array:___"+selectedPostIds+"  index:___"+index);
+      console.log($scope.dataPosts[selectedPostIds[index]]);
+      angular.element('.container').empty();
+      displayPost($scope.dataPosts[selectedPostIds[index]]);
     } else {
     $scope.key = tag;
     $scope.onSearch();
@@ -151,7 +148,7 @@ app.controller('presentPosts', function($scope){
     angular.element('.container').on('click', 'h3', function(){
     var titleId = angular.element(this).attr('class');
     $scope.showSinglePost(titleId);
-    })
+    });
   };
   
   $scope.showSinglePost = function(titleId){
@@ -163,15 +160,6 @@ app.controller('presentPosts', function($scope){
       clickedPost.clicks++;
     }
     displayPost(clickedPost);
-    // $.ajax({
-    //   type: "POST",
-    //   url: "127.0.0.1:3000/clicks",
-    //   data: { "clicks":clickedPost.clicks,
-    //           "id": titleId },
-    //   success: function(){
-    //     console.log(clickedPost.clicks);
-    //   }
-    // });
   };
   
   $scope.onSearch = function(){

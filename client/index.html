@@ -4,8 +4,6 @@
     <link rel="stylesheet" href="lib/style.css">
     <script src="lib/jquery.js"></script>
     <script src="lib/angular.min.js"></script>
-    <script src="lib/angular-route.js"></script>
-    <script src="helper-methods.js"></script>
     <script src="app.js"></script>
   </head>
   <body>
@@ -13,15 +11,16 @@
     <div class="centered">
       <h1>Open Source Data</h1>
       <input ng-model="key" ng-keyup="onSearch()"></input>
-      <button>all</button>
-      <button>aeronautics</button>
-      <button>earth-science</button>
-      <button>space-science</button>
-      <button>life-science</button>
-      <button>climate</button>
-      <button>engineering</button>
-      <button>operations</button>
-      <button>tags</button>
+      <button ng-click="buttonClick()">all</button>
+      <button ng-click="buttonClick()">aeronautics</button>
+      <button ng-click="buttonClick()">earth-science</button>
+      <button ng-click="buttonClick()">space-science</button>
+      <button ng-click="buttonClick()">life-science</button>
+      <button ng-click="buttonClick()">climate</button>
+      <button ng-click="buttonClick()">engineering</button>
+      <button ng-click="buttonClick()">operations</button>
+      <button ng-click="buttonClick()">tags</button>
+      <button ng-click="buttonClick()">random</button>
     </div>
     <div class='container'></div>
   </div>
