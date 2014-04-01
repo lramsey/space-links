@@ -1,10 +1,11 @@
 var query = 'http://data.nasa.gov/api/get_recent_datasets?count=100';
 var slugs;
 var app = angular.module("spaceLinks", []);
+
 app.controller('presentPosts', function($scope){
 
   $scope.ids = [];
-  slugs = {'':$scope.ids};
+  slugs = { '':$scope.ids, 'all': $scope.ids };
   $scope.dataPosts = {};
 
   $scope.getData = function(query){
@@ -22,6 +23,7 @@ app.controller('presentPosts', function($scope){
     for(var i = 0; i < posts.length; i++){
       filterPost(posts[i]);
     }
+    $scope.listenForTitleClick();
   }
 
   var filterPost = function(post){
@@ -69,13 +71,14 @@ app.controller('presentPosts', function($scope){
     }
   }
   var displayPost = function(results){
-    var $post = angular.element('<div></div>');
+    var $post = angular.element('<div class="post"></div>').append('</br>');
     var $el;
     for(var item in results){
       if(item === 'content'){
         $el = results[item];
       } else if (item === 'title'){
-        $el = angular.element('<h3 class="title"></h3>').text(results[item]);
+        $el = angular.element('<h3 class='+results.id+'></h3>');
+        $el.text(results[item]);
       } else if (item === 'source'){
         $el = angular.element('<a href='+results[item]+'></a>');
         $el.text(results[item]);
@@ -85,11 +88,27 @@ app.controller('presentPosts', function($scope){
       $post.append($el);
     }
     angular.element('.container').append($post);
+  
   };
 
   angular.element('button').on('click', function(){
-    
+    var tag = angular.element(this).text();
+    $scope.key = tag;
+    $scope.onSearch();
   });
+
+  $scope.listenForTitleClick = function(){
+    angular.element('.container').on('click', 'h3', function(){
+    var titleId = angular.element(this).attr('class');
+    $scope.showSinglePost(titleId);
+    })
+  };
+  
+  $scope.showSinglePost = function(titleId){
+    var clickedPost = $scope.dataPosts[titleId];
+    angular.element('.container').empty();
+    displayPost(clickedPost);
+  };
   
   $scope.onSearch = function(){
     var tag = slugs[$scope.key];

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html ng-app="spaceLinks">
+  <head>
+    <link rel="stylesheet" href="lib/style.css">
+    <script src="lib/jquery.js"></script>
+    <script src="lib/angular.min.js"></script>
+    <script src="lib/angular-route.js"></script>
+    <script src="helper-methods.js"></script>
+    <script src="app.js"></script>
+  </head>
+  <body>
+<div ng-controller="presentPosts">
+<h1>Open Source Data</h1>
+  <input ng-model="key" ng-keyup="onSearch()"></input>
+  <button>all</button>
+  <button>aeronautics</button>
+  <button>earth-science</button>
+  <button>space-science</button>
+  <button>life-science</button>
+  <button>climate</button>
+  <button>engineering</button>
+  <button>operations</button>
+  <div class='container'></div>
+  </body>
+</html>
