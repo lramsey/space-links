@@ -11,16 +11,17 @@
     <div class="centered">
       <h1>Open Source Data</h1>
       <input ng-model="key" ng-keyup="onSearch()"></input>
-      <button ng-click="buttonClick()">all</button>
-      <button ng-click="buttonClick()">aeronautics</button>
-      <button ng-click="buttonClick()">earth-science</button>
-      <button ng-click="buttonClick()">space-science</button>
-      <button ng-click="buttonClick()">life-science</button>
-      <button ng-click="buttonClick()">climate</button>
-      <button ng-click="buttonClick()">engineering</button>
-      <button ng-click="buttonClick()">operations</button>
-      <button ng-click="buttonClick()">tags</button>
-      <button ng-click="buttonClick()">random</button>
+      <button ng-click="buttonClick('all')">all</button>
+      <button ng-click="buttonClick('aeronautics')">aeronautics</button>
+      <button ng-click="buttonClick('earth-science')">earth-science</button>
+      <button ng-click="buttonClick('space-science')">space-science</button>
+      <button ng-click="buttonClick('life-science')">life-science</button>
+      <button ng-click="buttonClick('climate')">climate</button>
+      <button ng-click="buttonClick('engineering')">engineering</button>
+      <button ng-click="buttonClick('operations')">operations</button>
+      <button ng-click="buttonClick('tags')">tags</button>
+      <button ng-click="buttonClick('random')">random</button>
+      <button ng-click="buttonClick('shuffle')">shuffle</button>
     </div>
     <div class='container'></div>
   </div>

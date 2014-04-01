@@ -125,24 +125,28 @@ app.controller('presentPosts', function($scope){
   
   };
 
-  angular.element('button').on('click', function(){
-    var tag = angular.element(this).text();
-    if(tag === 'tags'){
+  $scope.buttonClick = function(input){
+    if(input === 'tags'){
       displaySlugs();
-    } else if (tag === 'random'){
+    } else if (input === 'random' || input === 'shuffle' || input === 'click rank'){
       $scope.key = $scope.key || 'all';
       console.log($scope.key);
       var selectedPostIds = slugs[$scope.key];
-      var index = Math.floor(Math.random()*selectedPostIds.length);
-      console.log("array:___"+selectedPostIds+"  index:___"+index);
-      console.log($scope.dataPosts[selectedPostIds[index]]);
       angular.element('.container').empty();
-      displayPost($scope.dataPosts[selectedPostIds[index]]);
+      if(input === 'random'){
+        var index = Math.floor(Math.random()*selectedPostIds.length);
+        displayPost($scope.dataPosts[selectedPostIds[index]]);
+      } else if( input === 'shuffle'){
+        shuffleDeck(selectedPostIds);
+        for(var i = 0; i < selectedPostIds.length; i++){
+          displayPost($scope.dataPosts[selectedPostIds[i]]);
+        }
+      }
     } else {
-    $scope.key = tag;
+    $scope.key = input;
     $scope.onSearch();
     }
-  });
+  };
 
   $scope.listenForTitleClick = function(){
     angular.element('.container').on('click', 'h3', function(){
@@ -171,6 +175,16 @@ app.controller('presentPosts', function($scope){
       }
     }
   };
+
+  var shuffleDeck = function(deck) {
+    for(var j = 0; j < deck.length; j++){
+      cardIndex = Math.floor(Math.random()*(deck.length-j));
+      var lastCard = deck[deck.length-1 - j];
+      deck[deck.length-1 - j] = deck[cardIndex];
+      deck[cardIndex] = lastCard;
+    }
+  };
+  
 
   $scope.getData(query);
 
