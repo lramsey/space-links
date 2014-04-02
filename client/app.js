@@ -5,7 +5,7 @@ app.controller('presentPosts', function($scope){
   $scope.initialize = function(){
     $scope.ids = [];
     $scope.slugs = { 'all': $scope.ids };
-    $scope.query = 'http://data.nasa.gov/api/get_recent_datasets?count=100';
+    $scope.query = 'http://data.nasa.gov/api/get_recent_datasets?count=20';
     $scope.dataPosts = {};
     $scope.key = 'all';
     $scope.getNasaData($scope.query);
@@ -22,34 +22,18 @@ app.controller('presentPosts', function($scope){
     });
   };
 
-  var postServerData = function(){
+  var postServerData = function(posts){
     $.ajax({
-      url: '127.0.0.1:3000/clicks',
+      url:'http://127.0.0.1:3000/clicks',
       type: 'POST',
-      dataType: 'jsonp',
+      data: posts,
       success: function(data){
-        getServerData(data);
+        var parsedData = JSON.parse(data);
+        console.log(parsedData);
+        displayPosts(parsedData);
       }
     });
   };
-
-  var getServerData = function(){
-    $.ajax({
-      url: '127.0.0.1:3000/clicks',
-      type: 'GET',
-      dataType: 'jsonp',
-      success: function(data){
-        filterData(data.posts);
-      }
-    });
-  };
-
- /* var filterData = function(posts){
-    for(var i = 0; i < posts.length; i++){
-      filterPost(posts[i]);
-    }
-    $scope.listenForTitleClick();
-  }; */
 
   var filterPosts = function(posts){
     var recursiveFilter = function(info){
@@ -91,7 +75,9 @@ app.controller('presentPosts', function($scope){
       recursiveFilter(posts[i]);
       slugBuilder(resultsObj);
     }
-    displayPosts($scope.dataPosts);
+    console.log($scope.dataPosts);
+    postServerData($scope.dataPosts);
+    //displayPosts($scope.dataPosts);
   };
 
 
@@ -210,7 +196,7 @@ app.controller('presentPosts', function($scope){
     } else {
       clickedPost.clicks++;
     }
-    displayPost(clickedPost);
+    postServerData($scope.dataPosts);
   };
   
   $scope.onSearch = function(){
