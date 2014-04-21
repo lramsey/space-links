@@ -5,7 +5,7 @@ var port = process.env.port || 3000;
 var app = express();
 
 app.configure(function(){
-  app.use('/', express.static(__dirname + '/../client'));
+  app.use('/', express.static(__dirname + '/client'));
   app.use(express.bodyParser());
 });
 
