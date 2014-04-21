@@ -32,7 +32,7 @@ app.controller('presentPosts', function($scope){
 
   var postServerData = function(posts){
     $.ajax({
-      url:'http://127.0.0.1:3000/clicks',
+      url:'/clicks',
       type: 'POST',
       data: posts,
       success: function(data){
@@ -47,7 +47,7 @@ app.controller('presentPosts', function($scope){
   var postNewClick = function(post){
     console.log('logging click in the server: ', post);
     $.ajax({
-      url:'http://127.0.0.1:3000/newClick',
+      url:'/newClick',
       type: 'POST',
       data: post,
       success: function(data){
