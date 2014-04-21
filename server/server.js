@@ -1,8 +1,7 @@
 var express = require('express');
 var handle = require('./request-handler.js');
 
-var port = 3000;
-//ip address 127.0.0.1
+var port = process.env.port || 3000;
 var app = express();
 
 app.configure(function(){
