@@ -37,6 +37,7 @@ app.controller('presentPosts', function($scope){
       data: posts,
       success: function(data){
         var parsedData = JSON.parse(data);
+        $scope.dataPosts = parsedData;
         displayPosts(parsedData);
         $scope.listenForTitleClick();
       }
@@ -51,6 +52,9 @@ app.controller('presentPosts', function($scope){
       data: post,
       success: function(data){
         var parsedData = JSON.parse(data);
+        for(var key in parsedData){
+          $scope.dataPosts[key] = parsedData[key];
+        }
         displayPosts(parsedData);
       }
     });
@@ -246,11 +250,7 @@ app.controller('presentPosts', function($scope){
   $scope.updateClickCount = function(titleId){
     var clickedPost = $scope.dataPosts[titleId];
     angular.element('.container').empty();
-    if(clickedPost.clicks === undefined){
-      clickedPost.clicks = 1;
-    } else {
-      clickedPost.clicks++;
-    }
+    clickedPost.clicks++;
     var serverObj = {};
     serverObj[titleId] = clickedPost;
     postNewClick(serverObj);
