@@ -18,3 +18,7 @@ var server = app.listen(port, function() {
 app.post('/clicks', function(req, res){
   handle.handleRequest(req, res);
 });
+
+app.post('/newClick', function(req, res){
+  handle.handleRequest(req, res);
+});

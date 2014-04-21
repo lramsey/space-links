@@ -1,15 +1,23 @@
+/* ------------------------------------------------------------------------------------*/
+/* ANGULAR SET UP & INIT
+/* ------------------------------------------------------------------------------------*/
+
 var app = angular.module("spaceLinks", []);
 
 app.controller('presentPosts', function($scope){
 
   $scope.initialize = function(){
     $scope.ids = [];
-    $scope.slugs = { 'all': $scope.ids };
-    $scope.query = 'http://data.nasa.gov/api/get_recent_datasets?count=20';
+    $scope.slugs = { 'all': $scope.ids, '': $scope.ids };
+    $scope.query = 'http://data.nasa.gov/api/get_recent_datasets?count=100';
     $scope.dataPosts = {};
-    $scope.key = 'all';
+    $scope.key = '';
     $scope.getNasaData($scope.query);
   };
+
+/* ------------------------------------------------------------------------------------*/
+/* AJAX
+/* ------------------------------------------------------------------------------------*/
 
   $scope.getNasaData = function(query){
     $.ajax({
@@ -29,39 +37,30 @@ app.controller('presentPosts', function($scope){
       data: posts,
       success: function(data){
         var parsedData = JSON.parse(data);
-        console.log(parsedData);
+        displayPosts(parsedData);
+        $scope.listenForTitleClick();
+      }
+    });
+  };
+
+  var postNewClick = function(post){
+    console.log('logging click in the server: ', post);
+    $.ajax({
+      url:'http://127.0.0.1:3000/newClick',
+      type: 'POST',
+      data: post,
+      success: function(data){
+        var parsedData = JSON.parse(data);
         displayPosts(parsedData);
       }
     });
   };
 
-  var filterPosts = function(posts){
-    var recursiveFilter = function(info){
-      for(var point in info){
-        if(info[point] !== ''){
-          if(typeof info[point] !== 'object' && info[point] !== ''){
-            if(point === 'content' || point === 'date' || point === 'modified'){
-              resultsObj[point] = info[point];
-            } else if (point === 'title' && resultsObj.title===undefined){
-              resultsObj.title = info[point];
-            } else if(point === 'slug'){
-              resultsObj.tags.push(info[point]);
-            } else if(point === 'id'){
-              resultsObj.srcId = info[point];
-            } else if(point === 'url'){
-              resultsObj.url = info[point];
-            } else if (point === 'clicks'){
-              resultsObj.clicks = info[point];
-            }
-          } else if(point === 'more_info_link') {
-            resultsObj.source = info[point][0];
-          } else {
-            recursiveFilter(info[point]);
-          }
-        }
-      }
-    };
+/* ------------------------------------------------------------------------------------*/
+/* DATA FILTERING
+/* ------------------------------------------------------------------------------------*/
 
+  var filterPosts = function(posts){
     for(var i = 0; i < posts.length; i++){
       var resultsObj = {};
       resultsObj.tags = [];
@@ -72,14 +71,37 @@ app.controller('presentPosts', function($scope){
       }
       $scope.ids.push(resultsObj.id);
       $scope.dataPosts[resultsObj.id] = resultsObj;
-      recursiveFilter(posts[i]);
+      recursiveFilter(posts[i], resultsObj);
       slugBuilder(resultsObj);
     }
-    console.log($scope.dataPosts);
     postServerData($scope.dataPosts);
-    //displayPosts($scope.dataPosts);
   };
 
+  var recursiveFilter = function(info, resultsObj){
+    for(var point in info){
+      if(info[point] !== ''){
+        if(typeof info[point] !== 'object' && info[point] !== ''){
+          if(point === 'content' || point === 'date' || point === 'modified'){
+            resultsObj[point] = info[point];
+          } else if (point === 'title' && resultsObj.title===undefined){
+            resultsObj.title = info[point];
+          } else if(point === 'slug'){
+            resultsObj.tags.push(info[point]);
+          } else if(point === 'id'){
+            resultsObj.srcId = info[point];
+          } else if(point === 'url'){
+            resultsObj.url = info[point];
+          } else if (point === 'clicks'){
+            resultsObj.clicks = info[point];
+          }
+        } else if(point === 'more_info_link') {
+          resultsObj.source = info[point][0];
+        } else {
+          recursiveFilter(info[point], resultsObj);
+        }
+      }
+    }
+  };
 
   var slugBuilder = function(results){
     for(var i = 0; i < results.tags.length; i++){
@@ -90,39 +112,14 @@ app.controller('presentPosts', function($scope){
     }
   };
 
-  var displaySlugs = function(){
-    angular.element('.container').empty();
-    var keyList = Object.keys($scope.slugs).sort();
-    angular.element('.container').append('<div class="col1"></div>');
-    angular.element('.container').append('<div class ="col2"></div>');
-    angular.element('.container').append('<div class= "col3"></div>');
-    for(var i = 0; i < keyList.length; i++){
-      $span = angular.element('<ul></ul>').text(keyList[i]);
-      if(i%3 === 0){
-        angular.element('.col3').append($span);
-      } else if (i%2 === 0){
-        angular.element('.col2').append($span);
-      } else {
-        angular.element('.col1').append($span);
-      }
-    }
-    angular.element('.container').on('click', 'ul', function(){
-      var tag = angular.element(this).text();
-      var posts = $scope.slugs[tag];
-      angular.element('.container').empty();
-      for(var i = 0; i < posts.length; i++){
-        console.log(posts[i]);
-        var item = $scope.dataPosts[posts[i]];
-        displayPost(item);
-      }
-    });
-  };
+/* ------------------------------------------------------------------------------------*/
+/*  DISPLAY DATA
+/* ------------------------------------------------------------------------------------*/
 
   var displayPosts = function(posts){
     for(var item in posts){
       displayPost(posts[item]);
     }
-    $scope.listenForTitleClick();
   };
 
   var displayPost = function(results){
@@ -148,32 +145,48 @@ app.controller('presentPosts', function($scope){
   
   };
 
+
+  var displaySlugs = function(){
+    slugSetUp();
+    var keyList = Object.keys($scope.slugs).sort();
+    for(var i = 0; i < keyList.length; i++){
+      $span = angular.element('<ul></ul>').text(keyList[i]);
+      if(i%3 === 0){
+        angular.element('.col3').append($span);
+      } else if (i%2 === 0){
+        angular.element('.col2').append($span);
+      } else {
+        angular.element('.col1').append($span);
+      }
+    }
+    slugListener();
+  };
+
+  var slugSetUp = function(){
+    angular.element('.container').empty();
+    angular.element('.container').append('<div class="col1"></div>');
+    angular.element('.container').append('<div class ="col2"></div>');
+    angular.element('.container').append('<div class= "col3"></div>');
+  };
+
+
+
+/* ------------------------------------------------------------------------------------*/
+/* BUTTON CLICK
+/* ------------------------------------------------------------------------------------*/
+
   $scope.buttonClick = function(input){
     if(input === 'tags'){
       displaySlugs();
     } else if (input === 'random' || input === 'shuffle' || input === 'rank'){
-      $scope.key = $scope.key || 'all';
       var selectedPostIds = $scope.slugs[$scope.key];
       angular.element('.container').empty();
       if(input === 'random'){
-        var index = Math.floor(Math.random()*selectedPostIds.length);
-        displayPost($scope.dataPosts[selectedPostIds[index]]);
+        showRandom(selectedPostIds);
       } else if(input === 'shuffle'){
-        shuffleDeck(selectedPostIds);
-        for(var i = 0; i < selectedPostIds.length; i++){
-          displayPost($scope.dataPosts[selectedPostIds[i]]);
-        }
+        showShuffle(selectedPostIds);
       } else if (input ==='rank'){
-        var selectedPosts = [];
-        for(var j = 0; j < selectedPostIds.length; j++){
-          selectedPosts.push($scope.dataPosts[selectedPostIds[j]]);
-        }
-        selectedPosts.sort(function(a, b){
-          return b.clicks-a.clicks;
-        });
-        for(var k = 0; k < selectedPosts.length; k++){
-          displayPost(selectedPosts[k]);
-        }
+        showRank(selectedPostIds);
       }
     } else {
     $scope.key = input;
@@ -181,14 +194,56 @@ app.controller('presentPosts', function($scope){
     }
   };
 
+  var showRandom = function(postIds){
+    var index = Math.floor(Math.random()*postIds.length);
+    displayPost($scope.dataPosts[postIds[index]]);
+  };
+
+  var showShuffle = function(postIds){
+    shuffleDeck(postIds);
+    for(var i = 0; i < postIds.length; i++){
+      displayPost($scope.dataPosts[postIds[i]]);
+    }
+  };
+
+  var showRank= function(postIds){
+    var selectedPosts = [];
+    for(var j = 0; j < postIds.length; j++){
+      selectedPosts.push($scope.dataPosts[postIds[j]]);
+    }
+    selectedPosts.sort(function(a, b){
+      return b.clicks-a.clicks;
+    });
+    for(var k = 0; k < selectedPosts.length; k++){
+      displayPost(selectedPosts[k]);
+    }
+  };
+
+/* ------------------------------------------------------------------------------------*/
+/* LISTENERS
+/* ------------------------------------------------------------------------------------*/
+
+
   $scope.listenForTitleClick = function(){
     angular.element('.container').on('click', 'h3', function(){
     var titleId = angular.element(this).attr('class');
-    $scope.showSinglePost(titleId);
+    $scope.updateClickCount(titleId);
+    });
+  };
+
+  var slugListener = function(){
+    angular.element('.container').on('click', 'ul', function(){
+      var tag = angular.element(this).text();
+      var posts = $scope.slugs[tag];
+      angular.element('.container').empty();
+      for(var i = 0; i < posts.length; i++){
+        var item = $scope.dataPosts[posts[i]];
+        displayPost(item);
+      }
     });
   };
   
-  $scope.showSinglePost = function(titleId){
+  $scope.updateClickCount = function(titleId){
     var clickedPost = $scope.dataPosts[titleId];
     angular.element('.container').empty();
     if(clickedPost.clicks === undefined){
@@ -196,11 +251,17 @@ app.controller('presentPosts', function($scope){
     } else {
       clickedPost.clicks++;
     }
-    postServerData($scope.dataPosts);
+    var serverObj = {};
+    serverObj[titleId] = clickedPost;
+    postNewClick(serverObj);
   };
+
+/* ------------------------------------------------------------------------------------*/
+/* HELPER FUNCTIONS
+/* ------------------------------------------------------------------------------------*/
+
   
   $scope.onSearch = function(){
-    $scope.key = $scope.key || 'all';
     var tag = $scope.slugs[$scope.key];
     angular.element('.container').empty();
     if(!!tag){
@@ -218,6 +279,10 @@ app.controller('presentPosts', function($scope){
       deck[cardIndex] = lastCard;
     }
   };
+
+/* ------------------------------------------------------------------------------------*/
+/* INIT INVOKED
+/* ------------------------------------------------------------------------------------*/
 
   $scope.initialize();
   

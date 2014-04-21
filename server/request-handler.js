@@ -9,21 +9,28 @@ var defaultCorsHeaders = {
 var serverStorage;
 
 exports.handleRequest = function(request, response) {
+  var output;
   if(request.method === "POST") {
     serverStorage = serverStorage || request.body;
-    for(var item in serverStorage){
+    if(request.path === '/clicks'){
       for(var key in request.body) {
-        if(!request.body[key]['clicks']){
-          request.body[key]['clicks'] = 0;
-        }
-        if(serverStorage[item]['clicks'] < request.body[key]['clicks'] && item===key ){
-          serverStorage[item]['clicks'] = request.body[key]['clicks'];
+        if(!serverStorage[key]['clicks']){
+          serverStorage[key]['clicks'] = 0;
         }
       }
+      output = JSON.stringify(serverStorage);
+    }
+
+    else if (request.path === '/newClick'){
+      var returnedPost;
+      for(var property in request.body){
+        serverStorage[property]['clicks'] = request.body[property]['clicks'];
+        returnedPost = { property: serverStorage[property] };
+      }
+      output = JSON.stringify(returnedPost);
     }
   }
 
-  var output = JSON.stringify(serverStorage);
   var statusCode = 200;
   var headers = defaultCorsHeaders;
 
