@@ -1,11 +1,26 @@
 {
-  "name": "space-links",
-  "description": "organizes links from nasa data api",
+  "name": "open-source-nasa",
+  "version": "1.0.0",
+  "description": "organize links from nasa data api",
+  "main": "server.js",
   "dependencies": {
     "express": "~3.5.1",
+    "underscore": "~1.6.0",
     "nodemon": "~1.0.17",
+    "request": "~2.34.0"
   },
-  "devDependencies": {
-    "request": "^2.34.0"
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lramsey/space-links.git"
+  },
+  "author": "Luke Ramsey",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/lramsey/space-links/issues"
   }
 }
